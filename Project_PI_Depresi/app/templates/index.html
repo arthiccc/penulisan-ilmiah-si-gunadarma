@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindCheck - Deteksi Dini Gejala Depresi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f0f4f8; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .hero-section { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); color: white; padding: 60px 0; border-radius: 0 0 50px 50px; }
+        .card { border: none; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .btn-primary { background-color: #2563eb; border: none; padding: 12px 30px; border-radius: 10px; font-weight: bold; }
+        .btn-primary:hover { background-color: #1d4ed8; }
+        #result-card { display: none; margin-top: 20px; transition: all 0.5s ease; }
+        .footer { margin-top: 50px; color: #64748b; font-size: 0.9rem; }
+        .emergency-box { background-color: #fee2e2; border-left: 5px solid #ef4444; padding: 15px; border-radius: 8px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="hero-section text-center">
+        <div class="container">
+            <h1 class="display-4 fw-bold">MindCheck</h1>
+            <p class="lead">Analisis Sentimen untuk Deteksi Dini Gejala Depresi</p>
+        </div>
+    </div>
+
+    <div class="container mt-n5" style="margin-top: -40px;">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card p-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">Bagaimana perasaan Anda hari ini?</h5>
+                        <p class="text-muted mb-4">Ceritakan apa yang Anda rasakan di bawah ini. Kami akan membantu menganalisis pola kalimat Anda.</p>
+                        
+                        <div class="mb-3">
+                            <textarea id="userInput" class="form-control" rows="5" placeholder="Tuliskan isi hati Anda di sini..."></textarea>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button onclick="analyzeText()" class="btn btn-primary btn-lg">Analisis Sekarang</button>
+                        </div>
+
+                        <div id="result-card" class="card mt-4">
+                            <div class="card-body text-center" id="result-content">
+                                <!-- Result will be injected here -->
+                            </div>
+                        </div>
+
+                        <div class="emergency-box mt-4">
+                            <strong>PENTING:</strong> Aplikasi ini hanyalah alat bantu analisis awal. Jika Anda merasa dalam kondisi darurat atau membutuhkan bantuan segera, hubungi layanan kesehatan mental profesional atau hotline darurat kesehatan mental terdekat.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer text-center">
+            <p>&copy; 2026 Jurusan Sistem Informasi - Penulisan Ilmiah</p>
+        </div>
+    </div>
+
+    <script>
+        async function analyzeText() {
+            const text = document.getElementById('userInput').value;
+            const resultCard = document.getElementById('result-card');
+            const resultContent = document.getElementById('result-content');
+
+            if (!text.trim()) {
+                alert("Silakan masukkan teks terlebih dahulu.");
+                return;
+            }
+
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: text })
+                });
+                
+                const data = await response.json();
+                
+                resultCard.style.display = 'block';
+                resultContent.innerHTML = `
+                    <h3 class="mb-3">Hasil Analisis:</h3>
+                    <div class="alert alert-${data.color} display-6 fw-bold">
+                        ${data.result}
+                    </div>
+                    <p class="mt-3">Berdasarkan analisis NLP, kalimat Anda memiliki pola sentimen yang mengarah pada status <strong>${data.result}</strong>.</p>
+                `;
+            } catch (error) {
+                console.error('Error:', error);
+                alert("Terjadi kesalahan pada server.");
+            }
+        }
+    </script>
+</body>
+</html>

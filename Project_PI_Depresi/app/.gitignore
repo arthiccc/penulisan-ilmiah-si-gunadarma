@@ -1,0 +1,6 @@
+venv/
+__pycache__/
+*.pkl
+app.log
+app_startup.log
+.gemini/
